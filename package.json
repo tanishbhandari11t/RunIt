@@ -1,0 +1,60 @@
+{
+  "name": "runit",
+  "displayName": "RunIt",
+  "description": "From Code to Running Application — One Command. RunIt analyzes any project, installs dependencies, and launches every service automatically.",
+  "version": "0.2.0",
+  "publisher": "runit-dev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tanishbhandari11t/RunIt"
+  },
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "launcher",
+    "run",
+    "automation",
+    "developer tools"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "runit.launch",
+        "title": "Launch Project",
+        "icon": "$(rocket)"
+      },
+      {
+        "command": "runit.stop",
+        "title": "Stop All Services",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "runit.showPlan",
+        "title": "Show Launch Plan"
+      },
+      {
+        "command": "runit.installCli",
+        "title": "Install 'launch-project' Terminal Command"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.93.0",
+    "typescript": "^5.5.0"
+  }
+}
