@@ -9,7 +9,7 @@ const MARKER = '# RunIt terminal command';
 const POWERSHELL_SNIPPET = [
   '',
   MARKER,
-  'function launch-project { code --open-url "vscode://runit-dev.runit/launch" }',
+  'function launch-project { code --open-url "vscode://tanishbhandari24.runit/launch" }',
   'Set-Alias runit launch-project',
   '',
 ].join('\r\n');
@@ -17,7 +17,7 @@ const POWERSHELL_SNIPPET = [
 const BASH_SNIPPET = [
   '',
   MARKER,
-  'alias launch-project=\'code --open-url "vscode://runit-dev.runit/launch"\'',
+  'alias launch-project=\'code --open-url "vscode://tanishbhandari24.runit/launch"\'',
   'alias runit=launch-project',
   '',
 ].join('\n');

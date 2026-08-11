@@ -2,9 +2,10 @@
   "name": "runit",
   "displayName": "RunIt",
   "description": "From Code to Running Application — One Command. RunIt analyzes any project, installs dependencies, and launches every service automatically.",
-  "version": "0.2.0",
-  "publisher": "runit-dev",
+  "version": "0.2.2",
+  "publisher": "tanishbhandari24",
   "license": "MIT",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/tanishbhandari11t/RunIt"

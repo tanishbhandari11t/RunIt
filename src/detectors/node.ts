@@ -33,7 +33,7 @@ export function detectNode(dir: string, label: string): ServicePlan[] {
   else if (deps['react']) framework = 'React';
   else if (deps['vue']) framework = 'Vue';
   else if (deps['@angular/core']) framework = 'Angular';
-  else if (deps['express']) framework = 'Express';
+  else if (deps['express']) framework = deps['jsonwebtoken'] ? 'Express (REST API + JWT)' : 'Express (REST API)';
   else if (deps['fastify']) framework = 'Fastify';
   else if (deps['vite']) framework = 'Vite';
 
@@ -52,15 +52,13 @@ export function detectNode(dir: string, label: string): ServicePlan[] {
       }
     }
   }
-  if (!launchCommand) {
-    return []; // Library package, nothing to run.
-  }
+  const plans: ServicePlan[] = [];
 
-  const isFrontend = ['Next.js', 'React', 'Vue', 'Angular', 'Vite'].includes(framework ?? '');
-  const role: ServiceRole = isFrontend ? 'frontend' : deps['express'] || deps['fastify'] ? 'backend' : 'app';
+  if (launchCommand) {
+    const isFrontend = !!framework && ['Next.js', 'React', 'Vue', 'Angular', 'Vite'].includes(framework);
+    const role: ServiceRole = isFrontend ? 'frontend' : deps['express'] || deps['fastify'] ? 'backend' : 'app';
 
-  return [
-    {
+    plans.push({
       name: `${isFrontend ? 'Frontend' : 'Node'}${framework ? ` (${framework})` : ''} — ${label}`,
       language: 'javascript',
       framework,
@@ -71,6 +69,23 @@ export function detectNode(dir: string, label: string): ServicePlan[] {
       order: isFrontend ? 3 : 2,
       readyPatterns: ['localhost:\\d+', 'ready in', 'compiled successfully', 'Local:', 'listening'],
       requiredTool: TOOLS.javascript,
-    },
-  ];
+    });
+  }
+
+  if (deps['jest'] || scripts['test']?.includes('jest')) {
+    plans.push({
+      name: `Tests (Jest) — ${label}`,
+      language: 'javascript',
+      framework: 'Jest',
+      role: 'test',
+      cwd: dir,
+      installCommands: plans.length === 0 ? ['npm install'] : [],
+      launchCommand: scripts['test'] ? 'npm run test -- --watchAll' : 'npx jest --watchAll',
+      order: 4,
+      readyPatterns: ['Ran all test suites', 'Watch Usage'],
+      requiredTool: TOOLS.javascript,
+    });
+  }
+
+  return plans;
 }

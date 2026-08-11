@@ -14,9 +14,12 @@ export function detectPython(dir: string, label: string): ServicePlan[] {
     return [];
   }
 
-  const py = TOOLS.python.command;
+  const basePy = TOOLS.python.command;
+  const py = process.platform === 'win32' ? '.venv\\\\Scripts\\\\python' : '.venv/bin/python';
 
-  const installCommands: string[] = [];
+  const installCommands: string[] = [
+    `${basePy} -m venv .venv`
+  ];
   if (has('requirements.txt')) {
     installCommands.push(`${py} -m pip install -r requirements.txt`);
   } else if (has('pyproject.toml')) {

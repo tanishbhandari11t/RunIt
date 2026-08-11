@@ -21,7 +21,7 @@ export function detectDocker(dir: string, label: string): ServicePlan[] {
       role: 'database',
       cwd: dir,
       installCommands: [],
-      launchCommand: 'docker compose up',
+      launchCommand: 'docker compose up --build || docker-compose up --build',
       order: 0,
       readyPatterns: ['Started', 'ready to accept connections', 'Attaching to'],
       requiredTool: TOOLS.docker,

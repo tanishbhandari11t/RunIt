@@ -10,7 +10,7 @@ export type Language =
   | 'rust'
   | 'docker';
 
-export type ServiceRole = 'database' | 'backend' | 'worker' | 'frontend' | 'app';
+export type ServiceRole = 'database' | 'backend' | 'worker' | 'frontend' | 'app' | 'test';
 
 export interface DetectedProject {
   /** Absolute path to the directory that was scanned. */

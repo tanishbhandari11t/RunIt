@@ -23,7 +23,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('runit.installCli', installTerminalCommand),
   );
 
-  // Deep link handler: "code --open-url vscode://runit-dev.runit/launch"
+  // Deep link handler: "code --open-url vscode://tanishbhandari24.runit/launch"
   // lets terminals (via the launch-project alias) trigger a launch.
   context.subscriptions.push(
     vscode.window.registerUriHandler({
