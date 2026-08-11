@@ -29,7 +29,7 @@ Run **Install 'launch-project' Terminal Command** once from the command palette.
 launch-project
 ```
 
-The command sends a `vscode://runit-dev.runit/launch` deep link to VS Code, which triggers RunIt in the active window. When a service prints its dev-server URL (e.g. `http://localhost:5173`), RunIt highlights it in the output and shows an **Open in Browser** notification.
+The command sends a `vscode://tanishbhandari24.runit/launch` deep link to VS Code, which triggers RunIt in the active window. When a service prints its dev-server URL (e.g. `http://localhost:5173`), RunIt highlights it in the output and shows an **Open in Browser** notification.
 
 ## What happens when you launch
 
@@ -44,12 +44,13 @@ The command sends a `vscode://runit-dev.runit/launch` deep link to VS Code, whic
 
 | Language | Detection | Install | Launch |
 | --- | --- | --- | --- |
-| JavaScript/TypeScript | `package.json` | `npm install` | `npm run dev` / `npm start` / entry file |
-| Python | `requirements.txt`, `manage.py`, `main.py` | `pip install -r requirements.txt` | framework-aware (uvicorn, Flask, Django, Streamlit) |
+| JavaScript/TypeScript | `package.json` (Express, JWT, Next.js, etc.) | `npm install` | `npm run dev` / `npm start` / entry file |
+| JavaScript (Tests) | `jest` in `package.json` | `npm install` | `npm run test -- --watchAll` or `npx jest` |
+| Python | `requirements.txt`, `manage.py`, `main.py` | Auto creates `.venv` & installs deps | framework-aware (FastAPI, Flask, Django, Streamlit) inside `.venv` |
 | Java | `pom.xml`, `build.gradle` | `mvn install` / `gradlew build` | `mvn spring-boot:run` / `gradlew bootRun` |
 | Go | `go.mod` | `go mod download` | `go run .` |
 | Rust | `Cargo.toml` | `cargo build` | `cargo run` |
-| Docker | `docker-compose.yml`, `compose.yaml` | — | `docker compose up` |
+| Docker | `docker-compose.yml`, `compose.yaml` | — | `docker compose up --build` or fallback to `docker-compose` |
 
 ## Architecture
 
