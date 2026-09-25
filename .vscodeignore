@@ -1,5 +1,7 @@
 .vscode/**
 .vscode-test/**
+.agenteval/**
+RunIt_Report.md
 src/**
 .gitignore
 tsconfig.json
