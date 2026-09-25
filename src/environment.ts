@@ -1,4 +1,4 @@
-import { execFile } from 'child_process';
+import { exec } from 'child_process';
 import { ServicePlan, ToolRequirement } from './types';
 
 export interface ToolCheckResult {
@@ -11,16 +11,17 @@ export interface ToolCheckResult {
 export async function checkEnvironment(plan: ServicePlan[]): Promise<ToolCheckResult[]> {
   const unique = new Map<string, ToolRequirement>();
   for (const service of plan) {
-    unique.set(service.requiredTool.command, service.requiredTool);
+    for (const tool of service.requiredTools) {
+      unique.set(tool.command, tool);
+    }
   }
 
   const checks = [...unique.values()].map(
     (tool) =>
       new Promise<ToolCheckResult>((resolve) => {
-        execFile(
-          tool.command,
-          tool.versionArgs,
-          { shell: process.platform === 'win32', timeout: 15000 },
+        exec(
+          [tool.command, ...tool.versionArgs].join(' '),
+          { timeout: 15000 },
           (error, stdout, stderr) => {
             const output = (stdout || stderr || '').trim().split('\n')[0];
             resolve({ tool, installed: !error, version: error ? undefined : output });

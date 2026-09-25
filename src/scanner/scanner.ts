@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { detectServices } from '../detectors/detector';
+import { detectSingleScript } from '../detectors/script';
 import { DetectedProject } from '../types';
 
 /** Directories that are never scanned. */
@@ -34,6 +35,10 @@ export function scanProject(root: string): DetectedProject {
       services.push(...detectServices(sub, entry.name));
       keyFiles.push(...listKeyFiles(sub, entry.name));
     }
+  }
+
+  if (services.length === 0) {
+    services.push(...detectSingleScript(root, path.basename(root)));
   }
 
   const languages = [...new Set(services.map((s) => s.language))];

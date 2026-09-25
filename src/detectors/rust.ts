@@ -3,11 +3,24 @@ import * as path from 'path';
 import { ServicePlan } from '../types';
 import { TOOLS } from './tools';
 
-/** Detects a Rust project from Cargo.toml. */
+/** Detects a runnable Rust crate or workspace from Cargo.toml; library-only crates are skipped. */
 export function detectRust(dir: string, label: string): ServicePlan[] {
-  if (!fs.existsSync(path.join(dir, 'Cargo.toml'))) {
+  let cargoToml: string;
+  try {
+    cargoToml = fs.readFileSync(path.join(dir, 'Cargo.toml'), 'utf8');
+  } catch {
     return [];
   }
+
+  const isRunnable =
+    /^\[workspace\]/m.test(cargoToml) ||
+    /^\[\[bin\]\]/m.test(cargoToml) ||
+    fs.existsSync(path.join(dir, 'src', 'main.rs')) ||
+    fs.existsSync(path.join(dir, 'src', 'bin'));
+  if (!isRunnable) {
+    return [];
+  }
+
   return [
     {
       name: `App (Rust) — ${label}`,
@@ -17,8 +30,8 @@ export function detectRust(dir: string, label: string): ServicePlan[] {
       installCommands: ['cargo build'],
       launchCommand: 'cargo run',
       order: 2,
-      readyPatterns: ['Running', 'listening'],
-      requiredTool: TOOLS.rust,
+      readyPatterns: ['Running `', 'listening', 'localhost:\\d+'],
+      requiredTools: [TOOLS.rust],
     },
   ];
 }

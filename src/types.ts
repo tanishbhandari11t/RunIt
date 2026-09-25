@@ -38,8 +38,10 @@ export interface ServicePlan {
   order: number;
   /** Regex sources that indicate the service is ready. */
   readyPatterns: string[];
-  /** Tool that must exist on the machine, e.g. "node". */
-  requiredTool: ToolRequirement;
+  /** Tools that must exist on the machine, e.g. node, or java + mvn. */
+  requiredTools: ToolRequirement[];
+  /** Command run in cwd after the process is killed, e.g. "docker compose down". */
+  stopCommand?: string;
 }
 
 export interface ToolRequirement {

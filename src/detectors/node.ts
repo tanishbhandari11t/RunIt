@@ -3,10 +3,18 @@ import * as path from 'path';
 import { ServicePlan, ServiceRole } from '../types';
 import { TOOLS } from './tools';
 
+const ENTRY_FILES = [
+  'server.js', 'index.js', 'main.js', 'app.js',
+  'server.ts', 'index.ts', 'main.ts', 'app.ts',
+  'src/server.js', 'src/index.js', 'src/main.js', 'src/app.js',
+  'src/server.ts', 'src/index.ts', 'src/main.ts', 'src/app.ts',
+];
+
 /**
  * Detects a Node.js / TypeScript project from package.json:
  * identifies the framework from dependencies and discovers the launch
- * command from scripts (dev > start > serve) or a conventional entry file.
+ * command from scripts (dev > start > serve), the "main" field, or a
+ * conventional entry file.
  */
 export function detectNode(dir: string, label: string): ServicePlan[] {
   const pkgPath = path.join(dir, 'package.json');
@@ -15,6 +23,7 @@ export function detectNode(dir: string, label: string): ServicePlan[] {
   }
 
   let pkg: {
+    main?: string;
     scripts?: Record<string, string>;
     dependencies?: Record<string, string>;
     devDependencies?: Record<string, string>;
@@ -45,13 +54,19 @@ export function detectNode(dir: string, label: string): ServicePlan[] {
     }
   }
   if (!launchCommand) {
-    for (const entry of ['server.js', 'index.js', 'main.js', 'app.js']) {
-      if (fs.existsSync(path.join(dir, entry))) {
-        launchCommand = `node ${entry}`;
-        break;
-      }
+    const candidates = [pkg.main, ...ENTRY_FILES].filter((f): f is string => !!f);
+    const entry = candidates.find((f) => isFile(path.join(dir, f)));
+    if (entry) {
+      launchCommand = runEntry(entry);
     }
   }
+  if (!launchCommand) {
+    const sources = listFiles(dir).filter((f) => /\.(c|m)?(j|t)s$/.test(f) && !isConfigFile(f));
+    if (sources.length === 1) {
+      launchCommand = runEntry(sources[0]);
+    }
+  }
+
   const plans: ServicePlan[] = [];
 
   if (launchCommand) {
@@ -68,7 +83,7 @@ export function detectNode(dir: string, label: string): ServicePlan[] {
       launchCommand,
       order: isFrontend ? 3 : 2,
       readyPatterns: ['localhost:\\d+', 'ready in', 'compiled successfully', 'Local:', 'listening'],
-      requiredTool: TOOLS.javascript,
+      requiredTools: [TOOLS.javascript],
     });
   }
 
@@ -83,9 +98,35 @@ export function detectNode(dir: string, label: string): ServicePlan[] {
       launchCommand: scripts['test'] ? 'npm run test -- --watchAll' : 'npx jest --watchAll',
       order: 4,
       readyPatterns: ['Ran all test suites', 'Watch Usage'],
-      requiredTool: TOOLS.javascript,
+      requiredTools: [TOOLS.javascript],
     });
   }
 
   return plans;
+}
+
+/** Plain JS runs on node; TypeScript runs through tsx so no build step is needed. */
+export function runEntry(file: string): string {
+  const posix = file.replace(/\\/g, '/');
+  return /\.(c|m)?ts$/.test(posix) ? `npx --yes tsx ${posix}` : `node ${posix}`;
+}
+
+function isConfigFile(file: string): boolean {
+  return /(\.config|rc)\.(c|m)?(j|t)s$/.test(file) || file.endsWith('.d.ts');
+}
+
+function isFile(file: string): boolean {
+  try {
+    return fs.statSync(file).isFile();
+  } catch {
+    return false;
+  }
+}
+
+function listFiles(dir: string): string[] {
+  try {
+    return fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isFile()).map((e) => e.name);
+  } catch {
+    return [];
+  }
 }

@@ -16,6 +16,41 @@ interface KnownError {
  */
 const KNOWN_ERRORS: KnownError[] = [
   {
+    pattern: /'([\w.-]+)' is not recognized as an internal or external command|(?:^|\s)([\w.-]+): (?:command )?not found/m,
+    reason: (m) => `The command \`${m[1] ?? m[2]}\` is not installed or not on your PATH.`,
+    solution: (m) => `Install ${m[1] ?? m[2]} and make sure it is on PATH, then restart VS Code so it picks up the new PATH.`,
+  },
+  {
+    pattern: /package ([\w./-]+) is not a main package|no Go files in/,
+    reason: () => 'Go found no `package main` in the directory being run, so there is nothing to execute.',
+    solution: () => 'Run the directory that contains `func main()`, e.g. `go run ./cmd/<name>`.',
+  },
+  {
+    pattern: /could not determine which binary to run/,
+    reason: () => 'This Cargo package or workspace has several binaries and cargo does not know which one to start.',
+    solution: () => 'Run `cargo run --bin <name>`, or set `default-run = "<name>"` under [package] in Cargo.toml.',
+  },
+  {
+    pattern: /Task '(\w+)' not found in root project/,
+    reason: (m) => `The Gradle build has no \`${m[1]}\` task.`,
+    solution: () => "Apply the `application` plugin and set `application { mainClass = '...' }` in build.gradle, or the Spring Boot plugin for `bootRun`.",
+  },
+  {
+    pattern: /The parameters 'mainClass' for goal org\.codehaus\.mojo:exec-maven-plugin.*are missing/,
+    reason: () => 'Maven does not know which class to run.',
+    solution: () => 'Configure `exec-maven-plugin` with a `<mainClass>` in pom.xml, or run `mvn exec:java -Dexec.mainClass=your.Main`.',
+  },
+  {
+    pattern: /(?:invalid target release:?|release version) (\d+)/,
+    reason: (m) => `The project targets Java ${m[1]}, which is newer than the installed JDK.`,
+    solution: (m) => `Install JDK ${m[1]} or newer (https://adoptium.net) and point JAVA_HOME at it.`,
+  },
+  {
+    pattern: /Error: Could not import ['"]?([\w.]+)|Could not import module ['"]([\w.]+)['"]/,
+    reason: (m) => `The server could not import the app module \`${m[1] ?? m[2]}\`.`,
+    solution: () => 'Check the module path and app variable name, e.g. `uvicorn app.main:app` or `flask --app app run`.',
+  },
+  {
     pattern: /ModuleNotFoundError: No module named ['"]?([\w.]+)/,
     reason: (m) => `The Python package \`${m[1]}\` is imported by the code but is not installed in the environment.`,
     solution: (m) => `pip install ${m[1]}`,
@@ -43,7 +78,7 @@ const KNOWN_ERRORS: KnownError[] = [
     solution: () => 'Make sure the dependency (database, cache, API) is started first and its host/port configuration is correct.',
   },
   {
-    pattern: /docker.*daemon.*(not running|cannot connect)/i,
+    pattern: /docker.*daemon.*(not running|cannot connect)|cannot connect to the docker daemon|failed to connect to the docker API/i,
     reason: () => 'Docker Desktop is installed but the Docker daemon is not running.',
     solution: () => 'Start Docker Desktop and run the launch again.',
   },

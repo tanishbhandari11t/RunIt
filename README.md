@@ -44,13 +44,14 @@ The command sends a `vscode://tanishbhandari24.runit/launch` deep link to VS Cod
 
 | Language | Detection | Install | Launch |
 | --- | --- | --- | --- |
-| JavaScript/TypeScript | `package.json` (Express, JWT, Next.js, etc.) | `npm install` | `npm run dev` / `npm start` / entry file |
+| JavaScript/TypeScript | `package.json` (Express, JWT, Next.js, etc.) | `npm install` | `npm run dev` / `npm start` / `main` field / entry file (`.ts` via `tsx`) |
 | JavaScript (Tests) | `jest` in `package.json` | `npm install` | `npm run test -- --watchAll` or `npx jest` |
-| Python | `requirements.txt`, `manage.py`, `main.py` | Auto creates `.venv` & installs deps | framework-aware (FastAPI, Flask, Django, Streamlit) inside `.venv` |
-| Java | `pom.xml`, `build.gradle` | `mvn install` / `gradlew build` | `mvn spring-boot:run` / `gradlew bootRun` |
-| Go | `go.mod` | `go mod download` | `go run .` |
+| Python | `requirements.txt`, `pyproject.toml`, `manage.py`, `main.py`, `app.py` | Auto creates `.venv` & installs deps | framework-aware (FastAPI, Flask, Django, Streamlit) inside `.venv` |
+| Java | `pom.xml`, `build.gradle(.kts)` | `mvnw`/`mvn install` / `gradlew`/`gradle build` | Spring Boot: `spring-boot:run` / `bootRun`; otherwise `exec:java` with the detected main class / `run` |
+| Go | `go.mod` | `go mod download` | `go run .` or `go run ./cmd/<name>` |
 | Rust | `Cargo.toml` | `cargo build` | `cargo run` |
-| Docker | `docker-compose.yml`, `compose.yaml` | — | `docker compose up --build` or fallback to `docker-compose` |
+| Docker | `docker-compose.yml`, `compose.yaml` | — | `docker compose up --build` (or `docker-compose`); `down` on stop |
+| Single script | one `.py`, `.js`, `.ts`, `.go`, or `.java` file in an otherwise empty project | — | runs the file directly |
 
 ## Architecture
 

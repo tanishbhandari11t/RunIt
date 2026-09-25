@@ -165,7 +165,7 @@ async function launchProject(): Promise<void> {
     );
   } else {
     vscode.window.showInformationMessage(
-      `RunIt: all ${result.started.length} service(s) are running.`,
+      `RunIt: all ${result.started.length} service(s) launched successfully.`,
     );
   }
 }

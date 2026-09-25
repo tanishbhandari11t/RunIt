@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { ServicePlan } from '../types';
-import { TOOLS } from './tools';
+import { resolveComposeCommand, TOOLS } from './tools';
 
 const COMPOSE_FILES = ['docker-compose.yml', 'docker-compose.yaml', 'compose.yaml', 'compose.yml'];
 
@@ -14,6 +14,7 @@ export function detectDocker(dir: string, label: string): ServicePlan[] {
   if (!composeFile) {
     return [];
   }
+  const compose = resolveComposeCommand();
   return [
     {
       name: `Docker Compose (${label})`,
@@ -21,10 +22,12 @@ export function detectDocker(dir: string, label: string): ServicePlan[] {
       role: 'database',
       cwd: dir,
       installCommands: [],
-      launchCommand: 'docker compose up --build || docker-compose up --build',
+      launchCommand: `${compose} up --build`,
       order: 0,
       readyPatterns: ['Started', 'ready to accept connections', 'Attaching to'],
-      requiredTool: TOOLS.docker,
+      requiredTools: [TOOLS.docker],
+      // Killing the CLI leaves containers running; compose must tear them down.
+      stopCommand: `${compose} down`,
     },
   ];
 }
